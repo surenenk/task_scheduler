@@ -6,7 +6,9 @@ Model:      CPU load parallelization
 Testing:	pytest
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Requirements:
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Design and implement a task scheduler to schedule and execute list of tasks in parallel.
 * Get the input as a text file with list of tasks in format "name, duration, [dep1 dep2 ...]".
@@ -15,7 +17,9 @@ Requirements:
 * Tasks should be executed only after their dependencies are completed.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Data Structures:
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Task Class:
@@ -24,53 +28,18 @@ Task Class:
 - deps: list of dependency tasks
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Program flow:
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-+-----------------+
-| Parse task file |
-+--------+--------+
-         |
-         v
-+---------------------+ no  +------------------------+
-| Valid dep graph?    |---> |    Error not valid     |
-+---------------------+     +------------------------+
-         | yes
-         v
-+--------+--------+      +------------------------+
-| Compute runtime |----->| Show --validate output |
-+--------+--------+      +------------------------+
-         |
-         v
-+--------------------------------------+
-| Fork process for each Task and       |
-| Wait on dependencies completion event|
-+--------------------------------------+
-         |
-         v
-+-------------------------+
-| Measure actual runtime  |
-| during process run      |
-+-------------------------+
-         |
-         v
-+------------------------------------+
-| Run actual task after deps are done|
-+------------------------------------+
-         |
-         v
-+-----------------------------------+
-| Measure difference between actual |
-| runtime and expected runtimes.    |
-+-----------------------------------+
-         |
-         v
-+---------------------------------+
-| Display results and exit program|
-+---------------------------------+
+Program flow:
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<img width="633" height="1292" alt="program_flow" src="https://github.com/user-attachments/assets/9ad156a1-92c3-46b9-b7bf-349b84975835" />
+
+
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Key Functions:
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 * parse_tasks(tasks):
@@ -101,12 +70,16 @@ Key Functions:
    - Returns actual vs expected runtime and a timeline of task execution.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Testing
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Functions can be tested individually by injecting input and extracting output
 * Compatible with pytest for unit and integration testing.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 History
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * 07/24/2025 - Initial design suren.eda@gmail.com
