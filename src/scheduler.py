@@ -11,7 +11,7 @@ import sys
 class Task:
     def __init__(self,name,duration,deps):
         self.name = name
-        self.duration = duration
+        self.duration = float(duration)
         self.deps = deps
 
 # parse the input params and return the components
@@ -43,7 +43,7 @@ def get_tasks(file):
                 # Try to split the line and on failure, error out
                 try:
                     name,duration,deps_str = line.strip().split(",",2)
-                    deps = deps_str.strip("[]").split()
+                    deps = deps_str.strip("[]").split(",")
                     # Create a dictionary of Task objects with task name as key
                     tasks[name.strip()] = Task(name.strip(),duration.strip(),deps)
                 except ValueError as e:
@@ -61,6 +61,9 @@ def is_dep_cyclic(tasks):
     stack = set()
 
     def dfs(task_name):
+        if not task_name:
+            return False
+
         if task_name in stack:
             return True
 
@@ -91,13 +94,59 @@ def validate_tasks(tasks):
 
     for task in tasks.values():
         for dep in task.deps:
+            if not dep:
+                break
+
             if dep not in task_names:
                 raise ValueError(f"Invalid dependency '{dep}' in task '{task.name}'")
 
     if is_dep_cyclic(tasks):
         raise ValueError("Cycle detected in task dependencies")
 
+# Calculate the expected runtime of task including the dependencies. Again use DFS to find max
+# time.
+def compute_expected_runtime(tasks):
+    if not tasks:
+        return 0
+
+    # Save the calculated runtime for all tasks. We will get the max from this.
+    task_mem = {}
+
+    def dfs(task_name):
+        if not task_name:
+            return 0
+
+        if task_name in task_mem:
+            return task_mem[task_name]
+
+        task = tasks[task_name]
+
+        if not task.deps:
+            # If no dependencies, total time is just task's duration
+            task_mem[task_name] = task.duration
+        else:
+            # Task duration + max time of all dependency chains
+            dep_times = []
+
+            for dep in task.deps:
+                dep_runtime = dfs(dep)
+                dep_times.append(dep_runtime)
+
+            task_mem[task_name] = task.duration + max(dep_times)
+
+        return task_mem[task_name]
+
+    # find the max of all tasks in our list and use that.
+    longest_path_runtime = max(dfs(name) for name in tasks.keys())
+
+    print(f"[Info] Expected parallel runtime: {longest_path_runtime} seconds")
+
+    return longest_path_runtime
+
 if __name__ := "__main__":
     inputs = input_parser()
     tasks = get_tasks(inputs.file)
     validate_tasks(tasks)
+
+    if inputs.validate:
+        compute_expected_runtime(tasks)
