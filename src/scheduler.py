@@ -4,8 +4,10 @@
 ###############################################################################################################
 
 import argparse
+from multiprocessing import Manager,Process,Event
 import os
 import sys
+import time
 
 # Basic class to store input components
 class Task:
@@ -23,6 +25,11 @@ def input_parser():
 
     # This should give us values for all arguments
     args = parser.parse_args()
+
+    if not args.validate and not args.run:
+        parser.print_help()
+        sys.exit(1)
+
     return args
 
 # Parse the input file passed and get the list of tasks
@@ -139,14 +146,73 @@ def compute_expected_runtime(tasks):
     # find the max of all tasks in our list and use that.
     longest_path_runtime = max(dfs(name) for name in tasks.keys())
 
-    print(f"[Info] Expected parallel runtime: {longest_path_runtime} seconds")
+    print(f"[Info] Expected parallel runtime: {longest_path_runtime:.6f} seconds")
 
     return longest_path_runtime
 
+# Run one task at a time but do event wait() for deps to do a set(). Until then
+# the task is blocked.
+def task_runner(task, task_events, timeline, work_fn):
+    if task.deps:
+        print(f"[PID {os.getpid()}] Task '{task.name}' waiting on: {task.deps}")
+
+    for dep in task.deps:
+        if not dep:
+            continue
+
+        task_events[dep].wait()
+
+    print(f"[PID {os.getpid()}] Task '{task.name}' starting")
+    start = time.time()
+    work_fn()
+    end = time.time()
+    timeline[task.name] = (start, end)
+    print(f"[PID {os.getpid()}] Task '{task.name}' finished")
+
+    task_events[task.name].set()
+
+# Run dep tasks in parallel for each task. Once process is done, do a process join which
+# will wait for all processes to complete.
+def run_parallel_tasks(tasks):
+    with Manager() as manager:
+        timeline = manager.dict()
+        task_events = {name: Event() for name in tasks}
+        processes = []
+
+        start_time = time.time()
+        for task in tasks.values():
+            p = Process(target=task_runner, args=(task, task_events, timeline, dummy_work_fn))
+            p.start()
+            processes.append(p)
+
+        for p in processes:
+            p.join()
+
+        end_time = time.time()
+        actual_runtime = end_time - start_time
+        expected_runtime = compute_expected_runtime(tasks)
+
+        print(f"[Info] Actual parallel runtime: {actual_runtime:.6f} seconds")
+
+        return {
+            "actual_runtime": actual_runtime,
+            "expected_runtime": expected_runtime,
+            "timeline": dict(timeline)
+        }
+
+# Dummy function for testing
+def dummy_work_fn():
+    time.sleep(10)
+
+
 if __name__ := "__main__":
     inputs = input_parser()
+
     tasks = get_tasks(inputs.file)
     validate_tasks(tasks)
 
     if inputs.validate:
         compute_expected_runtime(tasks)
+
+    if inputs.run:
+        run_parallel_tasks(tasks)
