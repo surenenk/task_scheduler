@@ -4,7 +4,7 @@ For full design look at **docs/design.md**
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Here is the usage for the program:
+## Here is the usage for the program:
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -12,7 +12,7 @@ Here is the usage for the program:
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Sample input.txt file for the program:
+## Sample input.txt file for the program:
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -29,7 +29,7 @@ $ cat input.txt
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Sample test with --validate option:
+## Sample test with --validate option:
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -39,7 +39,7 @@ $ python3 scheduler.py --file input.txt --validate
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Sample test with --run option:
+## Sample test with --run option:
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
