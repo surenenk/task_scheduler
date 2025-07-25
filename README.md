@@ -73,3 +73,16 @@ $ python3 scheduler.py --file input.txt --run
 
 [Info] Difference between Actual and expected runtime: 149.943777 seconds
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+## So how do we verify that multiprocessing works?
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Monitoring using htop shows all 4 cores are used when there are no dependencies:
+
+<img width="2140" height="1162" alt="htop_view" src="https://github.com/user-attachments/assets/b4017ba8-154c-48e6-93c8-c767a6f0ef84" />
+
+Similarly, nmon also shows good amount of CPU utilization on all cores:
+
+<img width="1307" height="603" alt="nmon_view" src="https://github.com/user-attachments/assets/0b484921-aac3-4d0b-af11-446794ec4ce3" />
