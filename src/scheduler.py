@@ -50,7 +50,8 @@ def get_tasks(file):
                 # Try to split the line and on failure, error out
                 try:
                     name,duration,deps_str = line.strip().split(",",2)
-                    deps = deps_str.strip("[]").split(",")
+                    deps_str = deps_str.strip()[1:-1]
+                    deps = [d.strip() for d in deps_str.split(",") if d.strip()]
                     # Create a dictionary of Task objects with task name as key
                     tasks[name.strip()] = Task(name.strip(),duration.strip(),deps)
                 except ValueError as e:
@@ -191,8 +192,10 @@ def run_parallel_tasks(tasks):
         end_time = time.time()
         actual_runtime = end_time - start_time
         expected_runtime = compute_expected_runtime(tasks)
+        runtime_diff = abs(actual_runtime - expected_runtime)
 
         print(f"[Info] Actual parallel runtime: {actual_runtime:.6f} seconds")
+        print(f"[Info] Difference between Actual and expected runtime: {runtime_diff:.6f} seconds")
 
         return {
             "actual_runtime": actual_runtime,
@@ -204,8 +207,7 @@ def run_parallel_tasks(tasks):
 def dummy_work_fn():
     time.sleep(10)
 
-
-if __name__ := "__main__":
+def main():
     inputs = input_parser()
 
     tasks = get_tasks(inputs.file)
@@ -216,3 +218,6 @@ if __name__ := "__main__":
 
     if inputs.run:
         run_parallel_tasks(tasks)
+
+if __name__ == "__main__":
+    main()
