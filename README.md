@@ -1,5 +1,7 @@
 # task_scheduler
 
+For full design look at **docs/design.md**
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Here is the usage for the program:
