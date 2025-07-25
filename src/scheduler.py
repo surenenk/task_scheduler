@@ -6,6 +6,7 @@
 import argparse
 from multiprocessing import Manager,Process,Event
 import os
+import subprocess
 import sys
 import time
 
@@ -153,7 +154,7 @@ def compute_expected_runtime(tasks):
 
 # Run one task at a time but do event wait() for deps to do a set(). Until then
 # the task is blocked.
-def task_runner(task, task_events, timeline, work_fn):
+def task_runner(task, task_events, timeline):
     if task.deps:
         print(f"[PID {os.getpid()}] Task '{task.name}' waiting on: {task.deps}")
 
@@ -165,7 +166,7 @@ def task_runner(task, task_events, timeline, work_fn):
 
     print(f"[PID {os.getpid()}] Task '{task.name}' starting")
     start = time.time()
-    work_fn()
+    subprocess.run([sys.executable, task.name], check=True)
     end = time.time()
     timeline[task.name] = (start, end)
     print(f"[PID {os.getpid()}] Task '{task.name}' finished")
@@ -182,7 +183,7 @@ def run_parallel_tasks(tasks):
 
         start_time = time.time()
         for task in tasks.values():
-            p = Process(target=task_runner, args=(task, task_events, timeline, dummy_work_fn))
+            p = Process(target=task_runner, args=(task, task_events, timeline))
             p.start()
             processes.append(p)
 
